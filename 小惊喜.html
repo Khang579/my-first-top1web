@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="UTF-8">
+    <title>旋转魔方</title>
+    <style>
+        body{
+            background-color: pink;
+            height: 100%;
+        }
+        .warp{
+            width: 10px;
+            height: 10px;
+            margin: 300px 600px;
+            position: relative;
+        }
+        /*包裹所有容器样式*/
+        .cube{
+            width:600px;
+            height:400px;
+            margin: 0 auto;
+            transform-style: preserve-3d;
+            transform: rotateX(-30deg) rotateY(-80deg);
+            -webkit-animation: rotate 20s linear infinite;
+            animation: rotate 20s linear infinite;
+        }
+        @-webkit-keyframes rotate{
+            from{transform: rotateX(0deg) rotateY(0deg);}
+            to{transform: rotateX(360deg) rotateY(360deg);}
+        }
+        @keyframes rotate{
+            from{transform: rotateX(0deg) rotateY(0deg);}
+            to{transform: rotateX(360deg) rotateY(360deg);}
+        }
+        .cube div{
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            opacity: 0.8;
+            transition: all .4s;
+        }
+        .pic{
+            width: 300px;
+            height: 300px;
+        }
+        .cube .out_front{
+            transform: rotateY(0deg) translateZ(150px);
+        }
+        .cube .out_back{
+            transform: translateZ(-150px) rotateY(180deg);
+        }
+        .cube .out_left{
+            transform: rotateY(90deg) translateZ(150px);
+        }
+        .cube .out_right{
+            transform: rotateY(-90deg) translateZ(150px);
+        }
+        .cube .out_top{
+            transform: rotateX(90deg) translateZ(150px);
+        }
+        .cube .out_bottom{
+            transform: rotateX(-90deg) translateZ(150px);
+        }
+        /*定义小正方体样式*/
+        .cube span{
+            display: block;
+            width: 200px;
+            height: 200px;
+            position: absolute;
+            top: 50px;
+            left: 50px;
+        }
+        .cube .in_pic{
+            width: 200px;
+            height: 200px;
+        }
+        .cube .in_front{
+            transform: rotateY(0deg) translateZ(100px);
+        }
+        .cube .in_back{
+            transform: translateZ(-100px) rotateY(180deg);
+        }
+        .cube .in_left{
+            transform: rotateY(90deg) translateZ(100px);
+        }
+        .cube .in_right{
+            transform: rotateY(-90deg) translateZ(100px);
+        }
+        .cube .in_top{
+            transform: rotateX(90deg) translateZ(100px);
+        }
+        .cube .in_bottom{
+            transform: rotateX(-90deg) translateZ(100px);
+        }
+        /*鼠标移入后样式*/
+        .cube:hover .out_front{
+            transform: rotateY(0deg) translateZ(400px);
+        }
+        .cube:hover .out_back{
+            transform: translateZ(-400px) rotateY(180deg);
+        }
+        .cube:hover .out_left{
+            transform: rotateY(90deg) translateZ(400px);
+        }
+        .cube:hover .out_right{
+            transform: rotateY(-90deg) translateZ(400px);
+        }
+        .cube:hover .out_top{
+            transform: rotateX(90deg) translateZ(400px);
+        }
+        .cube:hover .out_bottom{
+            transform: rotateX(-90deg) translateZ(400px);
+        }
+        /* 新增按钮样式 */
+        #startBtn {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background: #ff4081;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            display: none; /* 初始隐藏 */
+            z-index: 999;
+        }
+
+        /* 新增爱心样式 */
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            animation: float 3s linear forwards;
+            opacity: 0;
+        }
+
+        @keyframes float {
+            0% {
+                opacity: 1;
+                transform: translateY(0) translateX(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-500px) translateX(calc(-50% + (var(--random-offset))));
+            }
+        }
+    </style>
+    <style>
+        /* 新增密码框样式 */
+        #passwordModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9); /* 加深背景透明度 */
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px); /* 添加背景模糊效果 */
+        }
+        .modal-content {
+            background: #2d0b16; /* 深红色背景 */
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(255,80,129,0.3); /* 调整阴影效果 */
+            text-align: center;
+            border: 1px solid #ff408155; /* 添加发光边框 */
+        }
+        #passwordInput {
+            padding: 12px;
+            margin: 15px 0;
+            border: 2px solid #ff4081;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #1a040d; /* 深色输入框背景 */
+            color: #ffffff; /* 白色文字 */
+            width: 250px;
+        }
+        #passwordSubmit {
+            background: linear-gradient(145deg, #ff1a5e, #d1004d); /* 渐变色按钮 */
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        #passwordSubmit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,64,129,0.4);
+        }
+    </style>
+</head>
+<body>
+
+
+    <!-- 新增密码验证框 -->
+    <div id="passwordModal" style="display: none;">
+        <div class="modal-content">
+            <h2>请输入访问密码</h2>
+            <input type="password" id="passwordInput" placeholder="输入密码">
+            <button id="passwordSubmit">验证</button>
+        </div>
+    </div>
+
+    <!-- 原有body内容 -->
+    <div class="warp">
+    <div class="cube">
+        <div class="out_front">
+            <img src="1.jpg" class="pic">
+        </div>
+        <div class="out_back">
+            <img src="2.jpg" class="pic">
+        </div>
+        <div class="out_left">
+            <img src="3.jpg" class="pic">
+        </div>
+        <div class="out_right">
+            <img src="4.jpg" class="in_pic">
+        </div>
+        <div class="out_top">
+            <img src="5.jpg" class="in_pic">
+        </div>
+        <div class="out_bottom">
+            <img src="6.jpg" class="in_pic">
+        </div>
+        <span class="in_front">
+            <img src="7.jpg" class="in_pic">
+        </span>
+        <span class="in_back">
+            <img src="8.jpg" class="in_pic">
+        </span>
+        <span class="in_left">
+            <img src="9.jpg" class="in_pic">
+        </span>
+        <span class="in_right">
+            <img src="10.jpg" class="in_pic">
+        </span>
+        <span class="in_top">
+            <img src="11.jpg" class="in_pic">
+        </span>
+        <span class="in_bottom">
+            <img src="12.jpg" class="in_pic">
+        </span>
+    </div>
+</div>
+
+  <script>
+    // 密码验证功能
+    window.onload = function() {
+        // 显示密码框
+        document.getElementById('passwordModal').style.display = 'flex';
+        
+        document.getElementById('passwordSubmit').addEventListener('click', function() {
+            const password = document.getElementById('passwordInput').value;
+            if(password === 'gyc2004970') { // 示例密码
+                document.getElementById('passwordModal').style.display = 'none';
+                // 启动原有动画
+                intervalId = setInterval(createHearts, 300);
+                document.getElementById('bgm').play();
+            } else {
+                alert('密码错误，请重试！');
+            }
+        });
+    };
+
+    // 保持原有创建爱心函数
+    function createHearts() {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        heart.innerHTML = '❤️';
+        heart.style.left = Math.random() * 100 + '%';
+        heart.style.setProperty('--random-offset', Math.random() * 100 - 50 + 'px');
+        heart.style.animationDelay = Math.random() * 2 + 's';
+        document.body.appendChild(heart);
+        
+        setTimeout(() => heart.remove(), 3000);
+    }
+
+    // 保持原有页面关闭逻辑
+    window.addEventListener('beforeunload', function() {
+        clearInterval(intervalId);
+    });
+</script>
+<!-- 新增音乐控制 -->
+<div style="position: fixed; top: 20px; right: 20px;">
+    <audio id="bgm" controls loop>
+        <source src="bgm.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放
+    </audio>
+</div>
+<!-- 新增跳转按钮 -->
+<button id="navBtn" style="position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+    进入下一页
+</button>
+
+<script>
+    // 添加跳转事件
+    document.getElementById('navBtn').addEventListener('click', function() {
+        const bgm = document.getElementById('bgm');
+        const currentTime = bgm.currentTime;
+        
+        // 生成访问令牌并存储
+        const accessToken = Date.now().toString(36) + Math.random().toString(36).substr(2);
+        sessionStorage.setItem('pageToken', accessToken);
+        
+        window.location.href = `img second.html?time=${encodeURIComponent(currentTime)}&token=${accessToken}`;
+    });
+</script>
+</body>
+</html>
+
+<style>
+    /* 新增520背景文本 */
+    body::before {
+        content: "520";
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 300px;
+        font-weight: bold;
+        color: rgba(242, 6, 6, 0.985);
+        z-index: -1;
+        pointer-events: none;
+        animation: floatText 5s ease-in-out infinite;
+    }
+
+    @keyframes floatText {
+        0%, 100% {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        50% {
+            transform: translate(-50%, -55%) scale(1.05);
+        }
+    }
+</style>
